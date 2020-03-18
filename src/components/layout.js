@@ -1,11 +1,10 @@
-import React from "react"
+import React, { useState, useEffect } from "react"
 import AppBar from "@material-ui/core/AppBar"
 import Button from "@material-ui/core/Button"
-import CameraIcon from "@material-ui/icons/PhotoCamera"
+import SportsBasketballIcon from "@material-ui/icons/SportsBasketball"
 import Card from "@material-ui/core/Card"
 import CardActions from "@material-ui/core/CardActions"
 import CardContent from "@material-ui/core/CardContent"
-import CardMedia from "@material-ui/core/CardMedia"
 import CssBaseline from "@material-ui/core/CssBaseline"
 import Grid from "@material-ui/core/Grid"
 import Toolbar from "@material-ui/core/Toolbar"
@@ -64,12 +63,30 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 export default function Album() {
   const classes = useStyles()
 
+  const [game, setGame] = useState(null)
+  const URL =
+    "https://www.balldontlie.io/api/v1/games?start_date=2020-03-12&end_date=2020-03-12"
+  async function fetchData() {
+    // You can await here
+    const res = await fetch(URL)
+    const data = await res.json()
+    setGame(data)
+    console.log(data)
+  }
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  if (!game) {
+    return <div>loading...</div>
+  }
+
   return (
     <React.Fragment>
       <CssBaseline />
       <AppBar position="relative">
         <Toolbar>
-          <CameraIcon className={classes.icon} />
+          <SportsBasketballIcon className={classes.icon} />
           <Typography variant="h6" color="inherit" noWrap>
             OpeningTipOff
           </Typography>
@@ -86,7 +103,7 @@ export default function Album() {
               color="textPrimary"
               gutterBottom
             >
-              Album layout
+              OpeningTipOff
             </Typography>
             <Typography
               variant="h5"
@@ -94,40 +111,23 @@ export default function Album() {
               color="textSecondary"
               paragraph
             >
-              Something short and leading about the collection below—its
-              contents, the creator, etc. Make it short and sweet, but not too
-              short so folks don&apos;t simply skip over it entirely.
+              A place where all your favourite information about basketball can
+              be found.
             </Typography>
           </Container>
         </div>
         <Container className={classes.cardGrid} maxWidth="md">
           {/* End hero unit */}
           <Grid container spacing={4}>
-            {cards.map(card => (
-              <Grid item key={card} xs={12} sm={6} md={4}>
+            {game.data.map((card, index) => (
+              <Grid item key={index} xs={12} sm={6} md={4}>
                 <Card className={classes.card}>
-                  <CardMedia
-                    className={classes.cardMedia}
-                    image="https://source.unsplash.com/random"
-                    title="Image title"
-                  />
                   <CardContent className={classes.cardContent}>
                     <Typography gutterBottom variant="h5" component="h2">
-                      Heading
+                      {card.visitor_team.name} vs {card.home_team.name}
                     </Typography>
-                    <Typography>
-                      This is a media card. You can use this section to describe
-                      the content.
-                    </Typography>
+                    <Typography>{card.status}</Typography>
                   </CardContent>
-                  <CardActions>
-                    <Button size="small" color="primary">
-                      View
-                    </Button>
-                    <Button size="small" color="primary">
-                      Edit
-                    </Button>
-                  </CardActions>
                 </Card>
               </Grid>
             ))}
@@ -136,17 +136,6 @@ export default function Album() {
       </main>
       {/* Footer */}
       <footer className={classes.footer}>
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="textSecondary"
-          component="p"
-        >
-          Something here to give the footer a purpose!
-        </Typography>
         <Copyright />
       </footer>
       {/* End footer */}
